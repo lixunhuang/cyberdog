@@ -2,9 +2,9 @@
 This demo show the communication interface of MR813 motion control board based on Lcm
 - robot_control_cmd_lcmt.py
 - file_send_lcmt.py
-- Gait_Def_moonwalk.toml
-- Gait_Params_moonwalk.toml
-- Usergait_List.toml
+- /home/cyberdog_sim/src/learn/loco_hl_example/customized_gait/Gait_Def_moonwalk.toml
+- /home/cyberdog_sim/src/learn/loco_hl_example/customized_gait/Gait_Params_moonwalk.toml
+- /home/cyberdog_sim/src/learn/loco_hl_example/customized_gait/Usergait_List.toml
 '''
 import lcm
 import sys
@@ -33,7 +33,7 @@ def main():
     usergait_msg = file_send_lcmt()
     cmd_msg = robot_control_cmd_lcmt()
     try:
-        steps = toml.load("Gait_Params_moonwalk.toml")
+        steps = toml.load("/home/cyberdog_sim/src/learn/loco_hl_example/customized_gait/Gait_Params_moonwalk.toml")
         full_steps = {'step':[robot_cmd]}
         k =0
         for i in steps['step']:
@@ -60,13 +60,13 @@ def main():
             else:
                 full_steps['step'].append(cmd)
             k=k+1
-        f = open("Gait_Params_moonwalk_full.toml", 'w')
+        f = open("/home/cyberdog_sim/src/learn/loco_hl_example/customized_gait/Gait_Params_moonwalk_full.toml", 'w')
         f.write("# Gait Params\n")
         f.writelines(toml.dumps(full_steps))
         f.close()
 
-        file_obj_gait_def = open("Gait_Def_moonwalk.toml",'r')
-        file_obj_gait_params = open("Gait_Params_moonwalk_full.toml",'r')
+        file_obj_gait_def = open("/home/cyberdog_sim/src/learn/loco_hl_example/customized_gait/Gait_Def_moonwalk.toml",'r')
+        file_obj_gait_params = open("/home/cyberdog_sim/src/learn/loco_hl_example/customized_gait/Gait_Params_moonwalk_full.toml",'r')
         usergait_msg.data = file_obj_gait_def.read()
         lcm_usergait.publish("user_gait_file",usergait_msg.encode())
         time.sleep(0.5)
@@ -76,7 +76,7 @@ def main():
         file_obj_gait_def.close()
         file_obj_gait_params.close()
 
-        user_gait_list = open("Usergait_List.toml",'r')
+        user_gait_list = open("/home/cyberdog_sim/src/learn/loco_hl_example/customized_gait/Usergait_List.toml",'r')
         steps = toml.load(user_gait_list)
         for step in steps['step']:
             cmd_msg.mode = step['mode']
@@ -97,7 +97,7 @@ def main():
                 cmd_msg.step_height[i] = step['step_height'][i]
             lcm_cmd.publish("robot_control_cmd",cmd_msg.encode())
             time.sleep( 0.1 )
-        for i in range(75): #15s Heat beat It is used to maintain the heartbeat when life count is not updated
+        for i in range(150): #15s Heat beat It is used to maintain the heartbeat when life count is not updated
             lcm_cmd.publish("robot_control_cmd",cmd_msg.encode())
             time.sleep( 0.2 )
     except KeyboardInterrupt:
